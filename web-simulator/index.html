@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goa Distributed ACS & Interceptor Simulator</title>
+    <title>Goa Distributed ACS & Robot Arm Relay Simulator</title>
     <!-- Google Fonts: Outfit -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
@@ -20,9 +20,9 @@
         <header>
             <div class="brand">
                 <i data-lucide="cpu" class="neon-icon"></i>
-                <h1>Decentralized ACS <span class="highlight">Goa Simulator</span></h1>
+                <h1>Zone Partitioning <span class="highlight">Goa ACS Simulator</span></h1>
             </div>
-            <div class="subtitle">마이크로서비스 기반 분산 관제 및 고속 인터셉터 로봇 시뮬레이션</div>
+            <div class="subtitle">구역 분할 및 3D 공중 로봇팔 랑데부 릴레이 이송 분산 관제 시스템</div>
         </header>
 
         <!-- Main Dashboard Layout -->
@@ -34,26 +34,26 @@
                     <h2><i data-lucide="settings"></i> 관제 시스템 모드</h2>
                     <div class="mode-options">
                         <button id="mode-mono" class="btn-mode active">
-                            <span class="mode-title">Monolithic ACS</span>
-                            <span class="mode-desc">단일 중앙 관제 (전역 경로 + 병목)</span>
+                            <span class="mode-title">Monolithic ACS (단일 제어)</span>
+                            <span class="mode-desc">중앙 컴퓨터 1대가 8대 전역 경로 직접 계산 (동선 중첩, 병목 발생)</span>
                         </button>
                         <button id="mode-dist" class="btn-mode">
-                            <span class="mode-title">Goa Distributed ACS</span>
-                            <span class="mode-desc">분산 관제 + 인터셉터 (랑데부 버퍼)</span>
+                            <span class="mode-title">Goa Distributed ACS (분산 제어)</span>
+                            <span class="mode-desc">구역별 컴퓨터 3대 분산 관제 + 공중 로봇팔 & 고속 릴레이 로봇</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Simulator Controls -->
                 <div class="card glass-card">
-                    <h2><i data-lucide="sliders"></i> 환경 설정</h2>
+                    <h2><i data-lucide="sliders"></i> 환경 설정 (100대 스케일 모사)</h2>
                     <div class="control-group">
-                        <label for="speed-range">시뮬레이션 속도</label>
+                        <label for="speed-range">시뮬레이션 배속</label>
                         <input type="range" id="speed-range" min="1" max="5" value="2">
                     </div>
                     <div class="control-group">
-                        <label for="spawn-rate">주문 생성 속도</label>
-                        <input type="range" id="spawn-rate" min="1" max="10" value="5">
+                        <label for="spawn-rate">물동량 (주문 생성 속도)</label>
+                        <input type="range" id="spawn-rate" min="1" max="10" value="6">
                     </div>
                     <div class="button-group">
                         <button id="btn-start" class="btn btn-primary"><i data-lucide="play"></i> 시작</button>
@@ -64,22 +64,26 @@
 
                 <!-- Real-time Stats -->
                 <div class="card glass-card status-card">
-                    <h2><i data-lucide="activity"></i> 실시간 관제 지표</h2>
+                    <h2><i data-lucide="activity"></i> 실시간 관제 통계</h2>
                     <div class="metrics-grid">
                         <div class="metric-box">
-                            <span class="metric-label">총 처리 주문량</span>
+                            <span class="metric-label">총 이송 주문 완료</span>
                             <span id="metric-throughput" class="metric-value">0</span>
                         </div>
                         <div class="metric-box">
-                            <span class="metric-label">평균 배송 시간 (초)</span>
-                            <span id="metric-leadtime" class="metric-value">0.0</span>
+                            <span class="metric-label">관제 연산 지연 (Latency)</span>
+                            <span id="metric-latency" class="metric-value">0 ms</span>
                         </div>
                         <div class="metric-box">
-                            <span class="metric-label">로봇 간 충돌/지연</span>
-                            <span id="metric-deadlocks" class="metric-value status-good">0</span>
+                            <span class="metric-label">평균 배송 소요 시간</span>
+                            <span id="metric-leadtime" class="metric-value">0.0s</span>
                         </div>
                         <div class="metric-box">
-                            <span class="metric-label">중앙 서버 부하 (CPU)</span>
+                            <span class="metric-label">로봇 간 충돌률 (Collision)</span>
+                            <span id="metric-collision" class="metric-value status-good">0%</span>
+                        </div>
+                        <div class="metric-box col-span-2">
+                            <span class="metric-label">중앙 서버/로컬 서버 평균 CPU 부하</span>
                             <span id="metric-cpu" class="metric-value">0%</span>
                         </div>
                     </div>
@@ -91,7 +95,7 @@
                 <!-- Visualizer Area -->
                 <div class="card glass-card sim-card">
                     <div class="sim-header">
-                        <h2><i data-lucide="boxes"></i> 물류창고 로봇 실시간 모니터링 (3D Mockup 2D View)</h2>
+                        <h2><i data-lucide="boxes"></i> 스마트 물류 센터 구역 분할 및 릴레이 이송 모니터링 (3D Joint Arm View)</h2>
                         <div class="status-indicator">
                             <span class="dot blinking"></span>
                             <span id="sim-status-text">시뮬레이션 정지됨</span>
@@ -99,27 +103,26 @@
                     </div>
                     
                     <div class="canvas-container">
-                        <canvas id="sim-canvas" width="700" height="400"></canvas>
+                        <canvas id="sim-canvas" width="750" height="420"></canvas>
                         <!-- Legend overlay -->
                         <div class="legend">
-                            <div class="legend-item"><span class="legend-color aisle"></span>통로 전담 AMR</div>
-                            <div class="legend-item"><span class="legend-color interceptor"></span>고속 인터셉터</div>
-                            <div class="legend-item"><span class="legend-color rack"></span>재고 랙</div>
-                            <div class="legend-item"><span class="legend-color buffer"></span>랑데부 버퍼</div>
-                            <div class="legend-item"><span class="legend-color target"></span>최종 출하대</div>
+                            <div class="legend-item"><span class="legend-color aisle"></span>구역 전담 로봇 (Aisle AMR)</div>
+                            <div class="legend-item"><span class="legend-color interceptor"></span>릴레이 로봇 (Relay AMR)</div>
+                            <div class="legend-item"><span class="legend-color arm"></span>공중 관절 로봇팔</div>
+                            <div class="legend-item"><span class="legend-color buffer"></span>랑데부 버퍼 존</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Analysis Charts -->
                 <div class="card glass-card chart-card">
-                    <h2><i data-lucide="bar-chart-3"></i> 두 아키텍처 실시간 성능 비교 (Monolithic vs Goa Distributed)</h2>
+                    <h2><i data-lucide="bar-chart-3"></i> 제어 구조별 핵심 통계 비교 (단일 제어 vs 역할 분할 분산 제어)</h2>
                     <div class="charts-container">
                         <div class="chart-wrapper">
-                            <canvas id="chart-throughput"></canvas>
+                            <canvas id="chart-latency"></canvas>
                         </div>
                         <div class="chart-wrapper">
-                            <canvas id="chart-cpu"></canvas>
+                            <canvas id="chart-collision"></canvas>
                         </div>
                     </div>
                 </div>
@@ -127,11 +130,11 @@
                 <!-- Simulation Event Logs -->
                 <div class="card glass-card log-card">
                     <div class="log-header">
-                        <h2><i data-lucide="terminal"></i> 관제 시스템 실시간 로그 (Goa API Event Stream)</h2>
+                        <h2><i data-lucide="terminal"></i> 분산 관제 API 이벤트 실시간 로그 (Goa API Stream)</h2>
                         <button id="btn-clear-log" class="btn-text">Clear</button>
                     </div>
                     <div id="log-output" class="log-console">
-                        <div class="log-line system">[System] 시뮬레이터 준비 완료. 관제 모드를 선택한 후 시작 버튼을 누르십시오.</div>
+                        <div class="log-line system">[System] 대학교 연구실 협동 이송 모델 분석 시뮬레이터 로드 완료.</div>
                     </div>
                 </div>
             </section>
@@ -141,7 +144,6 @@
     <!-- Scripts -->
     <script src="app.js"></script>
     <script>
-        // Lucide 아이콘 초기화
         lucide.createIcons();
     </script>
 </body>

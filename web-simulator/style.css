@@ -21,8 +21,12 @@
     --neon-magenta: #ff007f;
     --neon-magenta-glow: rgba(255, 0, 127, 0.35);
 
+    --neon-pink: #f472b6;
+    --neon-pink-glow: rgba(244, 114, 182, 0.35);
+    
     --neon-red: #ff3b30;
     --neon-green: #34c759;
+    --neon-purple: #c084fc;
 
     --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
@@ -127,7 +131,7 @@ header {
 /* Dashboard Layout */
 .dashboard {
     display: grid;
-    grid-template-columns: 360px 1fr;
+    grid-template-columns: 380px 1fr;
     gap: 24px;
     align-items: start;
 }
@@ -321,6 +325,10 @@ header {
     flex-direction: column;
 }
 
+.col-span-2 {
+    grid-column: span 2;
+}
+
 .metric-label {
     font-size: 0.75rem;
     color: var(--text-secondary);
@@ -424,9 +432,8 @@ header {
 
 .legend-color.aisle { background-color: var(--neon-cyan); }
 .legend-color.interceptor { background-color: var(--neon-yellow); }
-.legend-color.rack { background-color: rgba(255, 255, 255, 0.15); }
+.legend-color.arm { background-color: var(--neon-purple); }
 .legend-color.buffer { background-color: var(--neon-magenta); }
-.legend-color.target { background-color: #a855f7; }
 
 /* Analysis Charts Layout */
 .chart-card {
